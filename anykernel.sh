@@ -1,12 +1,11 @@
 properties() { '
 kernel.string=ak3nthng for OnePlus Ace 3V
-do.devicecheck=1
+do.devicecheck=0
 do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
 do.check_boot_version=0
-device.name1=audi
 supported.versions=
 supported.patchlevels=
 supported.vendorpatchlevels=
