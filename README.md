@@ -2,10 +2,6 @@
 
 AnyKernel3 package for flashing custom kernels on the OnePlus Ace 3V.
 
-## Supported device
-
-- OnePlus Ace 3V — audi
-
 ## Usage
 
 Place the compatible kernel image in the repository root, package the contents as a ZIP, then flash it from a supported recovery or kernel flasher.
