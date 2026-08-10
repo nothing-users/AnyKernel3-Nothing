@@ -993,6 +993,56 @@ setup_ak() {
 }
 ###
 
+extract_kernel_version() {
+  local target="$1";
+  local version temporary;
+  version=$(strings "$target" 2>/dev/null | grep -oE 'Linux version [0-9]+\.[0-9]+\.[0-9]+-android[0-9]+' -m1 | cut -d' ' -f3);
+  if [ ! "$version" ]; then
+    temporary="${target}_ak3decomp";
+    magiskboot decompress "$target" "$temporary" 2>/dev/null;
+    if [ -f "$temporary" ]; then
+      version=$(strings "$temporary" 2>/dev/null | grep -oE 'Linux version [0-9]+\.[0-9]+\.[0-9]+-android[0-9]+' -m1 | cut -d' ' -f3);
+      rm -f "$temporary";
+    fi;
+  fi;
+  echo "$version";
+}
+
+version_ge() {
+  local new="$1" current="$2";
+  local new_major new_minor new_patch current_major current_minor current_patch;
+  [ "$new" == "$current" ] && return 0;
+  new_major=$(echo "$new" | cut -d. -f1);
+  new_minor=$(echo "$new" | cut -d. -f2);
+  new_patch=$(echo "$new" | cut -d. -f3);
+  current_major=$(echo "$current" | cut -d. -f1);
+  current_minor=$(echo "$current" | cut -d. -f2);
+  current_patch=$(echo "$current" | cut -d. -f3);
+  if [ "$new_major" != "$current_major" -o "$new_minor" != "$current_minor" ]; then
+    ui_print "Base version mismatch: $new_major.$new_minor != $current_major.$current_minor";
+    return 1;
+  fi;
+  [ "$new_patch" -ge "$current_patch" ] 2>/dev/null;
+}
+
+do_check_boot_version() {
+  [ "$(file_getprop anykernel.sh do.check_boot_version)" == 1 ] || return 0;
+  local new_version current_version new_kernel new_branch current_kernel current_branch;
+  new_version=$(extract_kernel_version "$AKHOME/Image");
+  [ "$new_version" ] || abort "Unable to read the version from Image.";
+  current_version=$(extract_kernel_version "$BLOCK");
+  [ "$current_version" ] || abort "Unable to read the version from the boot partition.";
+  new_kernel=$(echo "$new_version" | cut -d- -f1);
+  new_branch=$(echo "$new_version" | cut -d- -f2);
+  current_kernel=$(echo "$current_version" | cut -d- -f1);
+  current_branch=$(echo "$current_version" | cut -d- -f2);
+  ui_print "Image kernel: $new_version";
+  ui_print "Current kernel: $current_version";
+  [ "$new_branch" == "$current_branch" ] || abort "Android kernel branch mismatch.";
+  version_ge "$new_kernel" "$current_kernel" || abort "Kernel downgrade is not allowed.";
+}
+
 ### end methods
 
 setup_ak;
+do_check_boot_version;

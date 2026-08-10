@@ -1,41 +1,35 @@
 properties() { '
-kernel.string=ak3nthng for Nothing Phone devices
-do.devicecheck=1
+kernel.string=Universal AnyKernel3 for Nothing and GKI devices
+do.devicecheck=0
 do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=Spacewar
-device.name2=spacewar
-device.name3=Pong
-device.name4=pong
-device.name5=Pacman
-device.name6=pacman
-device.name7=PacmanPro
-device.name8=pacmanpro
-device.name9=Asteroids
-device.name10=asteroids
-device.name11=AsteroidsPro
-device.name12=asteroidspro
-device.name13=Metroid
-device.name14=metroid
-device.name15=Galaxian
-device.name16=galaxian
-device.name17=Frogger
-device.name18=frogger
-device.name19=FroggerPro
-device.name20=froggerpro
+do.check_boot_version=0
 supported.versions=
 supported.patchlevels=
 supported.vendorpatchlevels=
 '; }
 
-BLOCK=boot;
-IS_SLOT_DEVICE=1;
-RAMDISK_COMPRESSION=auto;
-PATCH_VBMETA_FLAG=auto;
+BLOCK=boot
+IS_SLOT_DEVICE=auto
+RAMDISK_COMPRESSION=auto
+PATCH_VBMETA_FLAG=auto
+NO_MAGISK_CHECK=1
 
-. tools/ak3-core.sh;
+. tools/ak3-core.sh
 
-split_boot;
-flash_boot;
+kernel_version=$(awk -F- '{ print $1 }' /proc/version | awk '{ print $3 }')
+case "$kernel_version" in
+  5.10*|5.15*|6.1*|6.6*|6.12*) ;;
+  *) abort "Unsupported non-GKI kernel: $kernel_version" ;;
+esac
+
+split_boot
+
+if [ -f "$SPLITIMG/ramdisk.cpio" ]; then
+  unpack_ramdisk
+  write_boot
+else
+  flash_boot
+fi

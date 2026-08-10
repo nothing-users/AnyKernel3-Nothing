@@ -1,25 +1,12 @@
-# AnyKernel3 for Nothing Phone
+# Universal AnyKernel3 for Nothing and GKI Devices
 
-AnyKernel3 template for flashing custom kernels on Nothing Phone devices.
-
-## Supported devices
-
-- Phone (1) — Spacewar
-- Phone (2) — Pong
-- Phone (2a) — Pacman
-- Phone (2a) Plus — PacmanPro
-- Phone (3a) — Asteroids
-- Phone (3a) Pro — AsteroidsPro
-- Phone (3) — Metroid
-- Phone (3a) Lite — Galaxian
-- Phone (4a) — Frogger
-- Phone (4a) Pro — FroggerPro
+Universal AnyKernel3 template for Nothing Phone and other GKI devices. Device codename checks are disabled.
 
 ## Usage
 
 Place the compatible kernel image in the repository root, package the contents as a ZIP, then flash it from a supported recovery or kernel flasher.
 
-The installer detects the active A/B slot and flashes the boot partition automatically.
+The installer detects the slot layout, locates the boot partition, preserves the existing ramdisk when required, and installs the kernel image automatically.
 
 ## Warning
 
